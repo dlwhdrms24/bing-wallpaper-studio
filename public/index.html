@@ -37,6 +37,19 @@
           <div class="lookup-actions"><button class="primary" id="lookup-button">사진 불러오기 <svg aria-hidden="true"><use href="#arrow"/></svg></button><button type="button" class="secondary" id="today"><svg aria-hidden="true"><use href="#sun"/></svg> 오늘의 사진</button></div>
           <p class="hint">Bing 홈페이지, 배경화면 이미지, 사진 정보, 스포트라이트(전체 화면 사진) 링크를 사용할 수 있어요.</p>
         </form>
+        <details class="sender" id="sender">
+          <summary>스포트라이트에서 버튼 한 번으로 보내기</summary>
+          <ol>
+            <li>아래 버튼을 브라우저 <strong>즐겨찾기 막대로 끌어다 놓으세요.</strong> (막대가 안 보이면 <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>)</li>
+            <li>Bing 스포트라이트에서 마음에 드는 사진이 나오면 그 즐겨찾기를 누르세요.</li>
+            <li>이 페이지가 새 탭으로 열리고, 화면에 보이던 사진을 바로 불러와요.</li>
+          </ol>
+          <div class="sender-actions">
+            <a id="bookmarklet" class="bookmarklet" href="#" draggable="true" title="즐겨찾기 막대로 끌어다 놓으세요"><svg aria-hidden="true"><use href="#landscape"/></svg> 월페이퍼로 보내기</a>
+            <button type="button" class="copy-code" id="copy-bookmarklet">코드 복사</button>
+          </div>
+          <p class="hint">끌어다 놓을 수 없으면 아무 즐겨찾기나 추가한 뒤, 복사한 코드를 즐겨찾기의 주소(URL) 칸에 붙여 넣으세요. 휴대폰 브라우저는 즐겨찾기 실행을 지원하지 않을 수 있어요.</p>
+        </details>
         <div class="divider"></div>
         <form id="download-form">
           <fieldset>

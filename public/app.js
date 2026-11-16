@@ -102,7 +102,7 @@ async function load(value, label) {
     wallpaper = result;
     title.textContent = result.title;
     const spotlight = result.source === 'spotlight';
-    credit.textContent = result.credit ? '© ' + result.credit : result.location || '';
+    credit.textContent = result.credit ? '© ' + result.credit : result.location && result.location !== result.title ? result.location : '';
     const date = result.date ? ' · ' + [result.date.slice(0, 4), result.date.slice(4, 6), result.date.slice(6)].join('.') : '';
     badge.lastChild.textContent = ' ' + (spotlight ? 'Bing 스포트라이트' : label) + date;
     original.href = 'https://www.bing.com/th?id=' + encodeURIComponent(spotlight ? result.id : result.id + '_UHD.jpg');
@@ -140,6 +140,33 @@ custom.addEventListener('input', () => {
   previewTimer = setTimeout(renderPreview, 350);
 });
 selectionChanged();
+
+// 즐겨찾기 버튼(북마클릿): 지금 보고 있는 Bing 페이지 주소를 이 도구로 보낸다.
+// 스포트라이트는 사진이 넘어갈 때마다 주소의 q·carindeximg가 바뀌므로 주소만 보내면 된다.
+const home = new URL('./', location.href).href;
+const bookmarkletCode = `javascript:(()=>{window.open(${JSON.stringify(home + '?url=')}+encodeURIComponent(location.href),'_blank','noopener')})();void 0`;
+const bookmarklet = byId('bookmarklet');
+bookmarklet.href = bookmarkletCode;
+bookmarklet.addEventListener('click', event => {
+  event.preventDefault();
+  message('이 버튼은 클릭하지 말고 즐겨찾기 막대로 끌어다 놓으세요.');
+});
+byId('copy-bookmarklet').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(bookmarkletCode);
+    message('코드를 복사했어요. 즐겨찾기의 주소(URL) 칸에 붙여 넣으세요.');
+  } catch {
+    message('복사하지 못했어요. 버튼을 즐겨찾기 막대로 끌어다 놓아 주세요.', true);
+  }
+});
+
+// ?url=로 열리면(즐겨찾기 버튼) 바로 불러오고, 주소창은 깔끔하게 되돌린다.
+const shared = new URLSearchParams(location.search).get('url');
+if (shared) {
+  history.replaceState(null, '', location.pathname);
+  url.value = shared.slice(0, 2000);
+  load(url.value, 'Bing 배경화면');
+}
 
 photo.addEventListener('error', () => {
   photo.hidden = true;
