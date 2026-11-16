@@ -46,7 +46,8 @@ describe('스포트라이트 링크', () => {
     const requested = new URL(fetch.mock.calls[0].arguments[0]);
     assert.equal(requested.origin + requested.pathname, 'https://www.bing.com/spotlight');
     assert.equal(requested.searchParams.get('q'), 'Ronda in the Province of Málaga, Spain');
-    assert.deepEqual([...requested.searchParams.keys()], ['spotlightId', 'q']);
+    assert.deepEqual([...requested.searchParams.keys()], ['spotlightId', 'q', 'mkt']);
+    assert.equal(requested.searchParams.get('mkt'), 'ko-KR');
   });
 
   it('q가 없거나 spotlightId가 이상하면 Bing을 호출하지 않고 거부한다', async () => {

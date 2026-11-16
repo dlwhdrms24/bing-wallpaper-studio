@@ -99,7 +99,8 @@ async function resolveSpotlight(url) {
   if (!spotlightIdPattern.test(spotlightId) || !query || query.length > 300) {
     throw new InputError('스포트라이트 링크에 spotlightId와 q가 있어야 해요. 사진을 연 상태의 주소를 그대로 복사해 주세요.');
   }
-  const response = await fromBing('/spotlight', { spotlightId, q: query });
+  // 시장(mkt)을 지정하지 않으면 서버 위치에 따라 Bing이 다른 사진 목록을 줘서 엉뚱한 사진을 고를 수 있다.
+  const response = await fromBing('/spotlight', { spotlightId, q: query, mkt: marketFor(url) });
   if (!response.ok) {
     await response.body?.cancel();
     throw new InputError('Bing 스포트라이트 페이지를 불러오지 못했어요.', response.status >= 500 ? 502 : 404);
