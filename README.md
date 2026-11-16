@@ -10,7 +10,8 @@
 - **오늘의 사진**: 버튼 하나로 Bing 홈페이지의 오늘 배경화면을 불러옵니다.
 - **링크 붙여 넣기**: Bing 이미지 주소(`/th?id=OHR…`)나 홈페이지의 **사진 정보** 링크를 넣으면 해당 사진을 찾습니다. 사진 정보 링크는 최근 목록(최대 16일 전)에서 찾고, 오래된 사진은 이미지 주소를 사용합니다.
 - **해상도 선택**: **원본**은 Bing의 UHD 파일을, 다른 옵션은 요청한 가로·세로(64~3840px)에 맞춰 Bing이 변환한 JPG를 내려받습니다. 비율이 다르면 일부가 잘릴 수 있습니다.
-- 지원 범위: Bing 홈페이지 배경화면만 다룹니다. 일반 이미지 검색 결과와 Windows 추천(Spotlight) 사진은 지원하지 않습니다.
+- **스포트라이트 링크**: Bing 스포트라이트 전체 화면 사진 주소(`/spotlight?spotlightId=…&q=…`)를 넣으면, 해당 페이지의 사진 목록에서 `q`(사진 제목)와 같은 항목을 찾아 원본(3840×2160)과 원하는 해상도로 저장합니다. 제목이 맞지 않으면 `carindeximg` 순서를 사용합니다.
+- 지원 범위: Bing 홈페이지 배경화면과 스포트라이트 사진을 다룹니다. 일반 이미지 검색 결과는 지원하지 않습니다.
 
 ## 아키텍처
 
@@ -27,18 +28,20 @@ flowchart LR
     end
     A -->|"HPImageArchive.aspx (사진 목록)"| BING[("www.bing.com")]
     A -->|"/th?id=…_UHD.jpg (이미지 스트리밍)"| BING
+    A -->|"/spotlight?spotlightId=&q= (스포트라이트 사진 목록)"| BING
 ```
 
 | 파일           | 역할                                                                                                                                                                          |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/bing.mjs` | Bing 링크를 해석해 이미지 ID를 찾고(`/th?id=`, 사진 정보 링크의 날짜·검색어), 최근 목록 API에서 제목·저작권·날짜를 읽습니다. 이미지 요청은 Bing 응답을 그대로 스트리밍합니다. |
+| `src/bing.mjs` | Bing 링크를 해석해 이미지 ID를 찾고(`/th?id=`, 사진 정보 링크의 날짜·검색어, 스포트라이트 페이지의 `FullScreenUrls`·`HeadingTexts`), 최근 목록 API에서 제목·저작권·날짜를 읽습니다. 이미지 요청은 Bing 응답을 그대로 스트리밍합니다. |
 | `build.mjs`    | `public/` 자산과 `bing.mjs`를 하나의 `fetch` 핸들러 모듈(`dist/server/index.js`)로 묶습니다. 같은 모듈을 서버리스 런타임에도 올릴 수 있는 형태입니다.                         |
 | `server.mjs`   | Node `http` 요청을 표준 `Request`로 바꿔 핸들러에 넘기고, 응답 본문을 스트림으로 전달합니다.                                                                                  |
 | `public/`      | 화면(HTML·CSS·JS). 붙여 넣기, 미리보기, 해상도 선택, 다운로드 UI                                                                                                              |
 
 **보안·안정성**
 
-- 입력 주소는 `bing.com` 하위 도메인만 허용하고, 포트·사용자 정보가 있는 URL은 거부합니다. 이미지 ID는 `OHR.…` 형식 정규식으로 검증합니다(임의 URL을 대신 가져오는 SSRF 방지).
+- 입력 주소는 `bing.com` 하위 도메인만 허용하고, 포트·사용자 정보가 있는 URL은 거부합니다. 이미지 ID는 `OHR.…`·`OBTQ.BT…` 형식 정규식으로 검증합니다(임의 URL을 대신 가져오는 SSRF 방지). 스포트라이트는 검증한 `spotlightId`와 `q`만 `www.bing.com/spotlight`에 전달합니다.
+- 다운로드 파일 이름은 영문·숫자·`_`·`-`만 허용합니다.
 - Bing 호출은 리디렉션을 따르지 않고 12초 제한 시간을 둡니다. 응답 형식이 `image/jpeg`가 아니면 전달하지 않습니다.
 - 정적 응답에 CSP(`img-src 'self' https://www.bing.com`), `nosniff`, `no-referrer`를 붙입니다. `GET`·`HEAD` 외 메서드는 거부합니다.
 - 오류는 사용자에게 보여 줄 한국어 메시지와 상태 코드(400·404·405·502)로 구분합니다.
@@ -51,7 +54,7 @@ Node.js 22 이상에서 별도 설치 없이 실행합니다.
 npm run dev
 ```
 
-http://127.0.0.1:4179/bing-wallpaper/ 를 엽니다. 서버에서 `www.bing.com`에 HTTPS로 접속할 수 있어야 합니다. Windows PowerShell에서는 `npm.cmd run dev`를 사용하세요. `npm run build`로 만든 `dist/server/index.js`를 `npm start`로 실행할 수 있습니다.
+http://127.0.0.1:4179/bing-wallpaper/ 를 엽니다. 테스트는 `npm test`(Node 내장 테스트 러너, Bing 호출은 모의 응답)로 실행합니다. 서버에서 `www.bing.com`에 HTTPS로 접속할 수 있어야 합니다. Windows PowerShell에서는 `npm.cmd run dev`를 사용하세요. `npm run build`로 만든 `dist/server/index.js`를 `npm start`로 실행할 수 있습니다.
 
 ## 배포
 

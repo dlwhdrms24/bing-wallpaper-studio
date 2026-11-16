@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "npm run build && npm start",
     "build": "node build.mjs",
-    "start": "node server.mjs"
+    "start": "node server.mjs",
+    "test": "node --test test/bing.test.mjs"
   }
 }

@@ -35,7 +35,10 @@ function sync() {
 function imagePath(id, size, attachment = false) {
   const params = new URLSearchParams({ id });
   if (size) { params.set('w', size[0]); params.set('h', size[1]); }
-  if (attachment) params.set('download', '1');
+  if (attachment) {
+    params.set('download', '1');
+    if (wallpaper?.name) params.set('name', wallpaper.name);
+  }
   return './api/image?' + params;
 }
 
@@ -98,10 +101,11 @@ async function load(value, label) {
     if (!response.ok) throw new Error(result.error);
     wallpaper = result;
     title.textContent = result.title;
-    credit.textContent = result.credit ? '© ' + result.credit : '';
+    const spotlight = result.source === 'spotlight';
+    credit.textContent = result.credit ? '© ' + result.credit : result.location || '';
     const date = result.date ? ' · ' + [result.date.slice(0, 4), result.date.slice(4, 6), result.date.slice(6)].join('.') : '';
-    badge.lastChild.textContent = ' ' + label + date;
-    original.href = 'https://www.bing.com/th?id=' + encodeURIComponent(result.id + '_UHD.jpg');
+    badge.lastChild.textContent = ' ' + (spotlight ? 'Bing 스포트라이트' : label) + date;
+    original.href = 'https://www.bing.com/th?id=' + encodeURIComponent(spotlight ? result.id : result.id + '_UHD.jpg');
     original.hidden = false;
     renderPreview();
   } catch (error) {
