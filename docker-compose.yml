@@ -1,0 +1,16 @@
+name: bing-wallpaper
+services:
+  bing-wallpaper:
+    build: .
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:${WALLPAPER_PORT:-14179}:4179'
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '-O', '/dev/null', 'http://127.0.0.1:4179/bing-wallpaper/']
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3

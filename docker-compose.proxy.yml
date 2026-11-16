@@ -1,0 +1,10 @@
+services:
+  bing-wallpaper:
+    ports: !reset []
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK:?기존 프록시 네트워크 이름을 지정하세요}

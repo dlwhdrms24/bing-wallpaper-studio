@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Bing 배경화면 링크에서 사진을 찾아 원하는 해상도로 저장하세요.">
+  <meta name="theme-color" content="#f3f4ed">
+  <title>월페이퍼 스튜디오 · Bing 배경화면 다운로더</title>
+  <link rel="icon" type="image/svg+xml" href="./icon.svg">
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" hidden><defs>
+    <symbol id="landscape" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="m4 17 5-5 3 3 3-4 5 6"/><circle cx="9" cy="8.5" r="1"/></symbol>
+    <symbol id="arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
+    <symbol id="link" viewBox="0 0 24 24"><path d="M10 13a4 4 0 0 0 6 1l3-3a4 4 0 0 0-6-6l-2 2m3 4a4 4 0 0 0-6-1l-3 3a4 4 0 0 0 6 6l2-2"/></symbol>
+    <symbol id="download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v4h16v-4"/></symbol>
+    <symbol id="external" viewBox="0 0 24 24"><path d="M13 5h6v6m0-6-9 9M9 5H5v14h14v-4"/></symbol>
+    <symbol id="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M19 5l-2 2M7 17l-2 2"/></symbol>
+  </defs></svg>
+  <header class="shell masthead">
+    <a href="./" class="brand"><span class="brand-icon"><svg aria-hidden="true"><use href="#landscape"/></svg></span> 월페이퍼 스튜디오</a>
+    <a href="https://www.bing.com/" class="quiet-link" target="_blank" rel="noopener noreferrer">Bing 열기 <svg aria-hidden="true"><use href="#external"/></svg></a>
+  </header>
+  <main class="shell">
+    <div class="intro">
+      <div class="eyebrow"><span class="dot"></span> BING WALLPAPER DOWNLOADER</div>
+      <h1>마음에 든 배경화면,<br><em>내 화면에 맞게.</em></h1>
+      <p>마음에 드는 Bing 사진의 링크를 붙여 넣고<br class="mobile-break"> 원하는 해상도로 저장하세요.</p>
+    </div>
+    <div class="workspace">
+      <section class="card controls" aria-label="배경화면 다운로드">
+        <form id="lookup">
+          <label class="step" for="url"><span>01</span> 배경화면 주소</label>
+          <div class="field"><svg aria-hidden="true"><use href="#link"/></svg><input id="url" type="text" inputmode="url" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="2000" placeholder="https://www.bing.com/th?id=…" required></div>
+          <div class="lookup-actions"><button class="primary" id="lookup-button">사진 불러오기 <svg aria-hidden="true"><use href="#arrow"/></svg></button><button type="button" class="secondary" id="today"><svg aria-hidden="true"><use href="#sun"/></svg> 오늘의 사진</button></div>
+          <p class="hint">Bing 홈페이지, 배경화면 이미지 또는 사진 정보 링크를 사용할 수 있어요.</p>
+        </form>
+        <div class="divider"></div>
+        <form id="download-form">
+          <fieldset>
+            <legend class="step"><span>02</span> 해상도 선택</legend>
+            <div class="presets">
+              <label><input type="radio" name="size" value="original" checked><span><strong>원본</strong><small>Bing UHD</small></span></label>
+              <label><input type="radio" name="size" value="1920x1080"><span><strong>Full HD</strong><small>1920 × 1080</small></span></label>
+              <label><input type="radio" name="size" value="2560x1440"><span><strong>QHD</strong><small>2560 × 1440</small></span></label>
+              <label><input type="radio" name="size" value="1080x1920"><span><strong>세로형</strong><small>1080 × 1920</small></span></label>
+              <label class="custom-choice"><input type="radio" name="size" value="custom"><span><strong>직접 입력</strong><small>가로 × 세로</small></span></label>
+            </div>
+            <div id="custom" class="custom" hidden>
+              <label>가로 <input name="w" type="number" min="64" max="3840" step="1" value="1920" required></label><span aria-hidden="true">×</span>
+              <label>세로 <input name="h" type="number" min="64" max="3840" step="1" value="1080" required></label>
+            </div>
+          </fieldset>
+          <button class="save" id="save" disabled><svg aria-hidden="true"><use href="#download"/></svg> JPG 다운로드</button>
+        </form>
+        <p id="status" class="status" role="status" aria-live="polite" hidden></p>
+      </section>
+      <figure class="card preview" aria-label="배경화면 미리보기">
+        <div class="photo">
+          <img id="photo" src="https://www.bing.com/th?id=OHR.AbrahamCanada_ROW4975668347_UHD.jpg&amp;w=1080&amp;h=720&amp;c=4&amp;rs=1" alt="앨버타주 에이브러햄 호수">
+          <div class="photo-empty" id="photo-empty" hidden><svg aria-hidden="true"><use href="#landscape"/></svg>사진을 불러오면 여기에 표시돼요.</div>
+          <span class="badge" id="badge"><span></span> 예시 사진</span>
+        </div>
+        <figcaption>
+          <div><div class="micro">WALLPAPER PREVIEW</div><h2 id="photo-title">캐나다 앨버타의 에이브러햄 호수</h2><p id="credit">© Guang Cao/Getty Images</p></div>
+          <a id="original" class="original" href="https://www.bing.com/th?id=OHR.AbrahamCanada_ROW4975668347_UHD.jpg" target="_blank" rel="noopener noreferrer" aria-label="Bing 원본 이미지 열기"><svg aria-hidden="true"><use href="#external"/></svg></a>
+        </figcaption>
+      </figure>
+    </div>
+  </main>
+  <footer class="shell"><span>WALLPAPER STUDIO</span><span>사진 출처: Bing · 사진의 권리는 각 저작권자에게 있습니다.</span></footer>
+</body>
+</html>
