@@ -2,6 +2,8 @@
 
 > Bing 배경화면 링크를 붙여 넣어 미리 보고, 원하는 해상도의 JPG로 저장하는 웹 도구입니다.
 > 공개 주소: `https://jong.3geun.com/bing-wallpaper/`
+>
+> 관련 저장소: [portfolio](https://github.com/dlwhdrms24/portfolio) · [medilens-demo](https://github.com/dlwhdrms24/medilens-demo)
 
 ## 무엇을 하는가
 
